@@ -4,6 +4,11 @@ pipeline {
     stage('Build') {
       steps { sh 'docker build -t mi-app-web:${BUILD_NUMBER} .' }
     }
+    stage('Scan') {
+      steps {
+        sh 'docker run --rm -v /var/run/docker.sock:/var/run/docker.sock -v trivy_cache:/root/.cache/ aquasec/trivy image --exit-code 1 --severity CRITICAL mi-app-web:${BUILD_NUMBER}'
+      }
+    }
     stage('Test') {
       steps {
         sh '''
